@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Cup 2026 — Live Stats Center</title>
+  <meta name="description" content="Live World Cup match and player statistics, updated in real time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">⚽</span>
+        <div class="brand-text">
+          <h1>World Cup 2026</h1>
+          <p>Live Stats Center</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="live-dot" id="liveDot" aria-hidden="true"></span>
+        <span id="liveLabel" class="live-label">LIVE</span>
+        <span class="sep">·</span>
+        <span id="lastUpdated" class="last-updated">updating…</span>
+      </div>
+      <div class="header-controls">
+        <label class="refresh-control">
+          <span>Auto-refresh</span>
+          <select id="refreshInterval" aria-label="Refresh interval">
+            <option value="5000">5s</option>
+            <option value="10000" selected>10s</option>
+            <option value="30000">30s</option>
+            <option value="60000">60s</option>
+            <option value="0">Off</option>
+          </select>
+        </label>
+        <button id="refreshNow" class="btn-refresh" type="button" title="Refresh now">⟳</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-view="matches">Matches</button>
+    <button class="tab" data-view="players">Players</button>
+    <button class="tab" data-view="teams">Teams</button>
+    <button class="tab" data-view="leaders">Leaderboards</button>
+  </nav>
+
+  <main class="container">
+    <!-- MATCHES -->
+    <section id="view-matches" class="view active">
+      <div class="section-head">
+        <h2>Matches</h2>
+        <div class="filter-pills" id="matchFilters">
+          <button class="pill active" data-status="all">All</button>
+          <button class="pill" data-status="LIVE">Live</button>
+          <button class="pill" data-status="HT">Half-time</button>
+          <button class="pill" data-status="FT">Finished</button>
+          <button class="pill" data-status="NS">Upcoming</button>
+        </div>
+      </div>
+      <div id="matchesGrid" class="matches-grid"></div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section id="view-players" class="view">
+      <div class="section-head">
+        <h2>All Players</h2>
+        <input id="playerSearch" class="search" type="search" placeholder="Search player or team…" />
+      </div>
+      <div class="table-wrap">
+        <table class="stats-table" id="playersTable">
+          <thead>
+            <tr>
+              <th data-sort="name" class="sortable left">Player</th>
+              <th data-sort="team" class="sortable left">Team</th>
+              <th data-sort="position" class="sortable">Pos</th>
+              <th data-sort="goals" class="sortable">G</th>
+              <th data-sort="assists" class="sortable">A</th>
+              <th data-sort="shots" class="sortable">Sh</th>
+              <th data-sort="passes" class="sortable">Pass</th>
+              <th data-sort="passAcc" class="sortable">Pass%</th>
+              <th data-sort="tackles" class="sortable">Tkl</th>
+              <th data-sort="minutes" class="sortable">Min</th>
+              <th data-sort="rating" class="sortable">Rating</th>
+            </tr>
+          </thead>
+          <tbody id="playersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TEAMS -->
+    <section id="view-teams" class="view">
+      <div class="section-head"><h2>Team Standings</h2></div>
+      <div id="groupsWrap" class="groups-wrap"></div>
+    </section>
+
+    <!-- LEADERBOARDS -->
+    <section id="view-leaders" class="view">
+      <div class="section-head"><h2>Tournament Leaders</h2></div>
+      <div class="leaders-grid" id="leadersGrid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Data source: <span id="sourceLabel">built-in live simulator</span>.
+      To use a real provider, set your API config in <code>config.js</code>.
+    </p>
+    <p class="muted">This project is an independent fan dashboard and is not affiliated with FIFA.</p>
+  </footer>
+
+  <!-- Player detail modal -->
+  <div class="modal-backdrop" id="playerModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+      <button class="modal-close" id="modalClose" aria-label="Close">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
