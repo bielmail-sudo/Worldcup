@@ -45,24 +45,25 @@
     { id: 16, name: "South Korea", code: "KOR", flag: "🇰🇷", group: "D" },
   ];
 
-  // Curated star names per team (rest of squad is generated)
+  // Curated stars per team, each with a realistic position (rest of squad is
+  // generated). Format: [name, position].
   const STARS = {
-    ARG: ["L. Messi", "J. Álvarez", "E. Martínez", "R. De Paul"],
-    MEX: ["S. Giménez", "H. Lozano", "E. Álvarez", "G. Ochoa"],
-    CRO: ["L. Modrić", "J. Stanišić", "A. Kramarić", "M. Pašalić"],
-    MAR: ["A. Hakimi", "Y. En-Nesyri", "H. Ziyech", "S. Amrabat"],
-    FRA: ["K. Mbappé", "A. Griezmann", "O. Dembélé", "W. Saliba"],
-    USA: ["C. Pulisic", "W. McKennie", "T. Adams", "Y. Musah"],
-    JPN: ["T. Kubo", "K. Mitoma", "D. Kamada", "W. Endō"],
-    SEN: ["S. Mané", "N. Jackson", "É. Mendy", "K. Koulibaly"],
-    BRA: ["Vinícius Jr.", "Rodrygo", "Raphinha", "Casemiro"],
-    ESP: ["Lamine Yamal", "Pedri", "Rodri", "Á. Morata"],
-    GER: ["J. Musiala", "F. Wirtz", "K. Havertz", "J. Kimmich"],
-    CAN: ["A. Davies", "J. David", "C. Larin", "S. Eustáquio"],
-    ENG: ["H. Kane", "J. Bellingham", "B. Saka", "P. Foden"],
-    POR: ["C. Ronaldo", "B. Fernandes", "R. Leão", "B. Silva"],
-    NED: ["V. van Dijk", "C. Gakpo", "F. de Jong", "M. Depay"],
-    KOR: ["Son Heung-min", "Lee Kang-in", "Kim Min-jae", "Hwang Hee-chan"],
+    ARG: [["L. Messi", "FW"], ["J. Álvarez", "FW"], ["E. Martínez", "GK"], ["R. De Paul", "MF"]],
+    MEX: [["S. Giménez", "FW"], ["H. Lozano", "FW"], ["E. Álvarez", "MF"], ["G. Ochoa", "GK"]],
+    CRO: [["L. Modrić", "MF"], ["J. Stanišić", "DF"], ["A. Kramarić", "FW"], ["M. Pašalić", "MF"]],
+    MAR: [["A. Hakimi", "DF"], ["Y. En-Nesyri", "FW"], ["H. Ziyech", "MF"], ["S. Amrabat", "MF"]],
+    FRA: [["K. Mbappé", "FW"], ["A. Griezmann", "FW"], ["O. Dembélé", "FW"], ["W. Saliba", "DF"]],
+    USA: [["C. Pulisic", "FW"], ["W. McKennie", "MF"], ["T. Adams", "MF"], ["Y. Musah", "MF"]],
+    JPN: [["T. Kubo", "FW"], ["K. Mitoma", "FW"], ["D. Kamada", "MF"], ["W. Endō", "MF"]],
+    SEN: [["S. Mané", "FW"], ["N. Jackson", "FW"], ["É. Mendy", "GK"], ["K. Koulibaly", "DF"]],
+    BRA: [["Vinícius Jr.", "FW"], ["Rodrygo", "FW"], ["Raphinha", "FW"], ["Casemiro", "MF"]],
+    ESP: [["Lamine Yamal", "FW"], ["Pedri", "MF"], ["Rodri", "MF"], ["Á. Morata", "FW"]],
+    GER: [["J. Musiala", "MF"], ["F. Wirtz", "MF"], ["K. Havertz", "FW"], ["J. Kimmich", "MF"]],
+    CAN: [["A. Davies", "DF"], ["J. David", "FW"], ["C. Larin", "FW"], ["S. Eustáquio", "MF"]],
+    ENG: [["H. Kane", "FW"], ["J. Bellingham", "MF"], ["B. Saka", "FW"], ["P. Foden", "MF"]],
+    POR: [["C. Ronaldo", "FW"], ["B. Fernandes", "MF"], ["R. Leão", "FW"], ["B. Silva", "MF"]],
+    NED: [["V. van Dijk", "DF"], ["C. Gakpo", "FW"], ["F. de Jong", "MF"], ["M. Depay", "FW"]],
+    KOR: [["Son Heung-min", "FW"], ["Lee Kang-in", "MF"], ["Kim Min-jae", "DF"], ["Hwang Hee-chan", "FW"]],
   };
 
   const POSITIONS = ["GK", "DF", "DF", "DF", "DF", "MF", "MF", "MF", "FW", "FW", "FW"];
@@ -90,15 +91,24 @@
     TEAMS.forEach((team) => {
       const rng = mulberry32(team.id * 7919);
       const stars = STARS[team.code] || [];
+      // Whether any star is a goalkeeper; if not, the first generated starter
+      // becomes the keeper so every starting XI has exactly one GK.
+      const starHasGK = stars.some((s) => s[1] === "GK");
+      const gkFillIndex = stars.length; // first non-star starter slot
       for (let i = 0; i < 16; i++) {
-        const position = POSITIONS[Math.min(i, POSITIONS.length - 1)] ||
-          (rng() < 0.5 ? "MF" : "DF");
-        let name;
+        let name, position;
         if (i < stars.length) {
-          name = stars[i];
+          name = stars[i][0];
+          position = stars[i][1];
         } else {
           name = GIVEN[Math.floor(rng() * GIVEN.length)] + " " +
             SURNAMES[Math.floor(rng() * SURNAMES.length)];
+          if (!starHasGK && i === gkFillIndex) {
+            position = "GK";
+          } else {
+            position = POSITIONS[Math.min(i, POSITIONS.length - 1)] ||
+              (rng() < 0.5 ? "MF" : "DF");
+          }
         }
         const starter = i < 11;
         players.push({
